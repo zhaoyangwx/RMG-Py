@@ -486,6 +486,8 @@ class KineticsFamily(Database):
                  forward_recipe=None,
                  reverse_template=None,
                  reverse_recipe=None,
+                 only_forward=False,
+                 only_reverse=False,
                  forbidden=None,
                  boundary_atoms=None,
                  tree_distances=None,
@@ -498,6 +500,8 @@ class KineticsFamily(Database):
         self.forward_recipe = forward_recipe
         self.reverse_template = reverse_template
         self.reverse_recipe = reverse_recipe
+        self.only_forward = only_forward
+        self.only_reverse = only_reverse if self.reversible else False
         self.forbidden = forbidden
         self.own_reverse = forward_template is not None and reverse_template is None
         self.boundary_atoms = boundary_atoms
@@ -714,6 +718,8 @@ class KineticsFamily(Database):
         local_context['False'] = False
         local_context['reverse'] = None
         local_context['reversible'] = None
+        local_context['only_forward'] = None
+        local_context['only_reverse'] = None
         local_context['boundaryAtoms'] = None
         local_context['treeDistances'] = None
         local_context['reverseMap'] = None
@@ -748,6 +754,10 @@ class KineticsFamily(Database):
             self.reverse = local_context.get('reverse', None)
             self.reversible = True if local_context.get('reversible', None) is None else local_context.get('reversible', None)
             self.forward_template.products = self.generate_product_template(self.forward_template.reactants)
+            self.only_forward = False if local_context.get('only_forward', None) is None\
+                else local_context.get('only_forward', None)
+            self.only_reverse = False if local_context.get('only_reverse', None) is None or not self.reversible\
+                else local_context.get('only_reverse', None)
             if self.reversible:
                 self.reverse_template = Reaction(reactants=self.forward_template.products,
                                                  products=self.forward_template.reactants)
@@ -1687,15 +1697,21 @@ class KineticsFamily(Database):
 
         return False
 
-    def _create_reaction(self, reactants, products, is_forward):
+    def _create_reaction(self, reactants, products, is_forward, consider_only_direction=False):
         """
         Create and return a new :class:`Reaction` object containing the
         provided `reactants` and `products` as lists of :class:`Molecule`
         objects.
+
+        If `consider_only_direction` is True, a reaction will only be identified in the direction
+        the family allows using the only_forward and only_reverse flags.
         """
 
         # Make sure the products are in fact different than the reactants
         if same_species_lists(reactants, products, save_order=self.save_order):
+            return None
+
+        if consider_only_direction and ((self.only_reverse and is_forward) or (self.only_forward and not is_forward)):
             return None
 
         # Create and return template reaction object
@@ -1786,6 +1802,7 @@ class KineticsFamily(Database):
                                      prod_resonance=prod_resonance,
                                      delete_labels=delete_labels,
                                      relabel_atoms=relabel_atoms,
+                                     consider_only_direction=True,
                                      ))
 
         if not self.own_reverse and self.reversible:
@@ -1797,10 +1814,11 @@ class KineticsFamily(Database):
                                          prod_resonance=prod_resonance,
                                          delete_labels=delete_labels,
                                          relabel_atoms=relabel_atoms,
+                                         consider_only_direction=True,
                                          ))
         return reaction_list
 
-    def add_reverse_attribute(self, rxn, react_non_reactive=True):
+    def add_reverse_attribute(self, rxn, react_non_reactive=True, consider_only_direction=False):
         """
         For rxn (with species' objects) from families with ownReverse, this method adds a `reverse`
         attribute that contains the reverse reaction information (like degeneracy)
@@ -1827,7 +1845,8 @@ class KineticsFamily(Database):
 
             reaction_list = self._generate_reactions([spc.molecule for spc in rxn.products],
                                                      products=rxn.reactants, forward=True,
-                                                     react_non_reactive=react_non_reactive)
+                                                     react_non_reactive=react_non_reactive,
+                                                    consider_only_direction=False)
             reactions = find_degenerate_reactions(reaction_list, same_reactants, kinetics_family=self)
             if len(reactions) == 0:
                 logging.error("Expecting one matching reverse reaction, not zero in reaction family {0} for "
@@ -1850,7 +1869,8 @@ class KineticsFamily(Database):
                 try:
                     reaction_list = self._generate_reactions([spc.molecule for spc in rxn.products],
                                                              products=rxn.reactants, forward=True,
-                                                             react_non_reactive=react_non_reactive)
+                                                             react_non_reactive=react_non_reactive,
+                                                            consider_only_direction=False)
                     reactions = find_degenerate_reactions(reaction_list, same_reactants, kinetics_family=self)
                 finally:
                     self.forbidden = temp_object
@@ -1943,7 +1963,7 @@ class KineticsFamily(Database):
         reactions = []
         for combo in molecule_combos:
             reactions.extend(self._generate_reactions(combo, products=reaction.products, forward=True,
-                                                      react_non_reactive=True))
+                                                      react_non_reactive=True, consider_only_direction=False))
 
         # remove degenerate reactions
         reactions = find_degenerate_reactions(reactions, same_reactants, template=reaction.template,
@@ -1961,7 +1981,7 @@ class KineticsFamily(Database):
         return reactions[0].degeneracy
 
     def _generate_reactions(self, reactants, products=None, forward=True, prod_resonance=True,
-                            react_non_reactive=False, delete_labels=True, relabel_atoms=True):
+                            react_non_reactive=False, delete_labels=True, relabel_atoms=True, consider_only_direction=False):
         """
         Generate a list of all the possible reactions of this family between
         the list of `reactants`. The number of reactants provided must match
@@ -2047,7 +2067,7 @@ class KineticsFamily(Database):
                             pass
                         else:
                             if product_structures is not None:
-                                rxn = self._create_reaction(reactant_structures, product_structures, forward)
+                                rxn = self._create_reaction(reactant_structures, product_structures, forward, consider_only_direction=consider_only_direction)
                                 if rxn:
                                     rxn_list.append(rxn)
         # Bimolecular reactants: A + B --> products
@@ -2090,7 +2110,7 @@ class KineticsFamily(Database):
                                     pass
                                 else:
                                     if product_structures is not None:
-                                        rxn = self._create_reaction(reactant_structures, product_structures, forward)
+                                        rxn = self._create_reaction(reactant_structures, product_structures, forward, consider_only_direction=consider_only_direction)
                                         if rxn:
                                             rxn_list.append(rxn)
 
@@ -2115,7 +2135,8 @@ class KineticsFamily(Database):
                                     else:
                                         if product_structures is not None:
                                             rxn = self._create_reaction(reactant_structures, product_structures,
-                                                                        forward)
+                                                                        forward,
+                                                                        consider_only_direction=consider_only_direction)
                                             if rxn:
                                                 rxn_list.append(rxn)
 
@@ -2168,7 +2189,8 @@ class KineticsFamily(Database):
                             pass
                         else:
                             if product_structures is not None:
-                                rxn = self._create_reaction(reactant_structures, product_structures, forward)
+                                rxn = self._create_reaction(reactant_structures, product_structures, forward,
+                                                            consider_only_direction=consider_only_direction)
                                 if rxn:
                                     rxn_list.append(rxn)
             else:
@@ -2233,7 +2255,8 @@ class KineticsFamily(Database):
                             pass
                         else:
                             if product_structures is not None:
-                                rxn = self._create_reaction(reactant_structures, product_structures, forward)
+                                rxn = self._create_reaction(reactant_structures, product_structures, forward,
+                                                            consider_only_direction=consider_only_direction)
                                 if rxn:
                                     rxn_list.append(rxn)
 
@@ -2281,7 +2304,8 @@ class KineticsFamily(Database):
                                                 if _productStructures is not None:
                                                     _rxn = self._create_reaction(_reactantStructures,
                                                                                  _productStructures,
-                                                                                 forward)
+                                                                                 forward,
+                                                                                 consider_only_direction)
                                                     if _rxn:
                                                         rxn_list.append(_rxn)
 
