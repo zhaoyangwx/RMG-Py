@@ -111,4 +111,4 @@ def decay_molecule(mol, check_deterministic=True):
         mol2.clear_labeled_atoms()
         mol2.update()
         return mol2.split()
-        
+
