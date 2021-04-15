@@ -1121,7 +1121,7 @@ def read_species_block(f, species_dict, species_aliases, species_list):
             break
         processed_tokens.append(token)
         if token in species_dict:
-            logging.debug("Re-using species {0} already in species_dict".format(token))
+            #logging.debug("Re-using species {0} already in species_dict".format(token))
             species = species_dict[token]
         else:
             species = Species(label=token)
