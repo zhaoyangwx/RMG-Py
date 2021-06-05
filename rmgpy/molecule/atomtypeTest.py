@@ -135,15 +135,15 @@ class TestAtomType(unittest.TestCase):
         """
         failed = []
         for name, atom_type in rmgpy.molecule.atomtype.ATOMTYPES.items():
-            adjlist = "1 {} ux".format(name)
+            adjlist = f"1 {name} ux"
             group = rmgpy.molecule.Group().from_adjacency_list(adjlist)
             try:
                 result = group.make_sample_molecule()
-                # logging.info("For {} made\n{}".format(name, result.to_adjacency_list()))
+                # logging.info(f"For {name} made\n{result.to_adjacency_list()}")
             except:
-                logging.exception("Couldn't make sample molecule for atomType {}".format(name))
+                logging.exception(f"Couldn't make sample molecule for atomType {name}")
                 failed.append(name)
-        self.assertFalse(failed, "Couldn't make sample molecules for types {}".format(', '.join(failed)))
+        self.assertFalse(failed, f"Couldn't make sample molecules for types {', '.join(failed)}")
 
 ################################################################################
 
