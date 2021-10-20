@@ -335,6 +335,10 @@ class Species(object):
             for molecule in self.molecule:
                 if molecule.is_identical(other, strict=strict):
                     return True
+        elif isinstance(other, Fragment):
+            for molecule in self.molecule:
+                if molecule.is_identical(other, strict=strict):
+                    return True
         elif isinstance(other, Species):
             for molecule1 in self.molecule:
                 for molecule2 in other.molecule:
@@ -688,7 +692,7 @@ class Species(object):
         """
         `True` if the species has at least one reactive molecule, `False` otherwise
         """
-        cython.declare(molecule=Molecule)
+        cython.declare(molecule=Graph)
         return any([molecule.reactive for molecule in self.molecule])
 
     def copy(self, deep=False):
