@@ -118,7 +118,7 @@ def catalyst_properties(bindingEnergies=None,
     metal_db.load(os.path.join(settings['database.directory'], 'surface'))
 
     if metal and (bindingEnergies or surfaceSiteDensity):
-        raise InputError("In catalyst_properties section you should only specify a 'metal' shortcut " 
+        raise InputError("In catalyst_properties section you should only specify a 'metal' shortcut "
                          "or the surfaceSiteDensity and bindingEnergies, but not both.")
 
     if metal:
@@ -135,7 +135,7 @@ def catalyst_properties(bindingEnergies=None,
             logging.info("Using default binding energies, Pt(111)")
         else:
             rmg.binding_energies = convert_binding_energies(bindingEnergies)
-    
+
 
         if surfaceSiteDensity is None:
             rmg.surface_site_density = metal_db.get_surface_site_density("Pt111")
@@ -155,8 +155,8 @@ def catalyst_properties(bindingEnergies=None,
 def convert_binding_energies(binding_energies):
     """
     Process binding_energies dictionary from the input file
-    
-    It converts the values into Energy quantities, and checks that 
+
+    It converts the values into Energy quantities, and checks that
     all elements C,H,O, and N are present.
 
     :param binding_energies: a dictionary of element symbol: binding energy pairs
@@ -228,7 +228,7 @@ def react(tups):
             if not isinstance(it, str):
                 raise InputError("React takes a list of tuples of species strings.")
     rmg.init_react_tuples = tups
-            
+
 # Reaction systems
 def simple_reactor(temperature,
                    pressure,
@@ -326,7 +326,7 @@ def simple_reactor(temperature,
             logging.debug("  {0}".format(const_spc))
             if const_spc not in species_dict:
                 raise InputError('Species {0} not found in the input file'.format(const_spc))
-    
+
     if not isinstance(T, list):
         sensitivityTemperature = T
     if not isinstance(P, list):
@@ -432,9 +432,9 @@ def constant_V_ideal_gas_reactor(temperature,
         termination.append(TerminationRateRatio(terminationRateRatio))
     if len(termination) == 0:
         raise InputError('No termination conditions specified for reaction system #{0}.'.format(len(rmg.reaction_systems) + 2))
-    
+
     initial_cond = initialMoleFractions
-    initial_cond["T"] = T 
+    initial_cond["T"] = T
     initial_cond["P"] = P
     system = ConstantVIdealGasReactor(rmg.reaction_model.core.phase_system,rmg.reaction_model.edge.phase_system,initial_cond,termination)
     system.T = Quantity(T)
@@ -714,7 +714,7 @@ def constant_T_V_liquid_reactor(temperature,
         if outlet_volumetric_flow_rate:
             if outlet_volumetric_flow_rate != outletVolumetricFlowRate:
                 raise InputError('  Inconsistent residence time and inlet volumetric flow rate')
-            
+
         outlet_volumetric_flow_rate = Quantity(outletVolumetricFlowRate).value_si
 
     if inletConcentrations:
@@ -816,7 +816,7 @@ def constant_T_V_liquid_reactor(temperature,
             evap_cond_conditions[key] = item
         evap_cond_conditions["P"] = vapor_pressure
         evap_cond_conditions["T"] = initial_conditions["T"]
-    
+
     system = ConstantTVLiquidReactor(rmg.reaction_model.core.phase_system,
                                            rmg.reaction_model.edge.phase_system,
                                            initial_conditions,
@@ -1089,9 +1089,9 @@ def model(toleranceMoveToCore=None, toleranceMoveEdgeReactionToCore=np.inf, tole
           maxNumSpecies=None, maxNumObjsPerIter=1, terminateAtMaxObjects=False,
           toleranceThermoKeepSpeciesInEdge=np.inf, dynamicsTimeScale=(0.0, 'sec'),
           toleranceBranchReactionToCore=0.0, branchingIndex=0.5, branchingRatioMax=1.0,
-          toleranceTransitoryDict={}):
+          toleranceTransitoryDict={}, transitoryStepPeriod=20):
     """
-    How to generate the model. `toleranceMoveToCore` must be specified. 
+    How to generate the model. `toleranceMoveToCore` must be specified.
     toleranceMoveReactionToCore and toleranceReactionInterruptSimulation refers to an additional criterion for forcing an edge reaction to be included in the core
     by default this criterion is turned off
     Other parameters are optional and control the pruning.
@@ -1131,6 +1131,7 @@ def model(toleranceMoveToCore=None, toleranceMoveEdgeReactionToCore=np.inf, tole
             branching_index=branchingIndex,
             branching_ratio_max=branchingRatioMax,
             transitory_tol_dict=toleranceTransitoryDict,
+            transitory_step_period=transitoryStepPeriod,
         )
     )
 
@@ -1416,7 +1417,7 @@ def set_global_rmg(rmg0):
 
 def read_input_file(path, rmg0):
     """
-    Read an RMG input file at `path` on disk into the :class:`RMG` object 
+    Read an RMG input file at `path` on disk into the :class:`RMG` object
     `rmg`.
     """
     global rmg, species_dict
@@ -1511,7 +1512,7 @@ def read_input_file(path, rmg0):
 
 def read_thermo_input_file(path, rmg0):
     """
-    Read an thermo estimation input file at `path` on disk into the :class:`RMG` object 
+    Read an thermo estimation input file at `path` on disk into the :class:`RMG` object
     `rmg`.
     """
 
@@ -1570,7 +1571,7 @@ def read_thermo_input_file(path, rmg0):
 
 def save_input_file(path, rmg):
     """
-    Save an RMG input file at `path` on disk from the :class:`RMG` object 
+    Save an RMG input file at `path` on disk from the :class:`RMG` object
     `rmg`.
     """
 
