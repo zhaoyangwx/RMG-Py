@@ -48,12 +48,8 @@ from rmgpy.solver.simple import SimpleReactor
 from rmgpy.solver.surface import SurfaceReactor
 from rmgpy.util import as_list
 from rmgpy.data.surface import MetalDatabase
-<<<<<<< HEAD
-from rmgpy.rmg.reactors import Reactor, ConstantVIdealGasReactor, ConstantTLiquidSurfaceReactor, ConstantTVLiquidReactor
+from rmgpy.rmg.reactors import Reactor, ConstantVIdealGasReactor, ConstantTLiquidSurfaceReactor, ConstantTVLiquidReactor, ConstantTPIdealGasReactor
 from rmgpy.kLAkH import liquidVolumetricMassTransferCoefficientPowerLaw
-=======
-from rmgpy.rmg.reactors import Reactor, ConstantVIdealGasReactor, ConstantTLiquidSurfaceReactor, ConstantTPIdealGasReactor
->>>>>>> 214506c8f (add constantTPidealgas reactor)
 
 ################################################################################
 
