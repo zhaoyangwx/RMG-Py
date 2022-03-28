@@ -840,18 +840,7 @@ def load_species_dictionary(path, generate_resonance_structures=True):
         for line in f:
             if line.strip() == '' and adjlist.strip() != '':
                 # Finish this adjacency list
-                if len(re.findall(r'([LR]\d?)', adjlist)) != 0:
-                    frag = Fragment().from_adjacency_list(adjlist)
-                    species = Species(molecule = [frag])
-                    for label in adjlist.splitlines():
-                        if label.strip():
-                            break
-                    else:
-                        label = ''
-                    if len(label.split()) > 0 and not label.split()[0].isdigit():
-                        species.label = label.strip()
-                else:
-                    species = Species().from_adjacency_list(adjlist)
+                species = Species().from_adjacency_list(adjlist)
                 if generate_resonance_structures:
                     species.generate_resonance_structures()
                 label = species.label
@@ -870,18 +859,7 @@ def load_species_dictionary(path, generate_resonance_structures=True):
                 adjlist += line
         else:  #reach end of file
             if adjlist.strip() != '':
-                if len(re.findall(r'([LR]\d?)', adjlist)) != 0:
-                    frag = Fragment().from_adjacency_list(adjlist)
-                    species = Species(molecule = [frag])
-                    for label in adjlist.splitlines():
-                        if label.strip():
-                            break
-                    else:
-                        label = ''
-                    if len(label.split()) > 0 and not label.split()[0].isdigit():
-                        species.label = label.strip()
-                else:
-                    species = Species().from_adjacency_list(adjlist)
+                species = Species().from_adjacency_list(adjlist)
                 if generate_resonance_structures:
                     species.generate_resonance_structures()
                 label = species.label
