@@ -295,8 +295,6 @@ class Database(object):
         Load the dictionary containing all of the species in a kinetics library or depository.
         """
         from rmgpy.species import Species
-        from rmgpy.molecule.fragment import Fragment
-        import re
         species_dict = OrderedDict()
         with open(path, 'r') as f:
             adjlist = ''
