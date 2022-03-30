@@ -1308,9 +1308,7 @@ class MoleculeDrawer(object):
             bounding_rect = [x1, y1, x2, y2]
 
             # Set color for text
-            if not isinstance(atom, Atom):
-                cr.set_source_rgba(0.0, 0.5, 0.0, 1.0)
-            elif atom.element.isotope != -1:
+            if not isinstance(atom, Atom) or atom.element.isotope != -1:
                 cr.set_source_rgba(0.0, 0.5, 0.0, 1.0)
             elif heavy_atom == 'C':
                 cr.set_source_rgba(0.0, 0.0, 0.0, 1.0)
