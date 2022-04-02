@@ -36,7 +36,7 @@ from queue import Queue
 
 import cython
 
-from rmgpy.molecule.molecule import Atom, Bond
+from rmgpy.molecule.molecule import Atom
 from rmgpy.molecule.graph import Vertex, Edge
 
 def find_butadiene(start, end):
