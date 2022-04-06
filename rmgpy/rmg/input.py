@@ -185,10 +185,7 @@ def species(label, structure, reactive=True, cut=False, size_threshold=None):
 
     if cut:
         mol_to_frag[label] = {} # key:original molecule label, value:created fragment label
-        if size_threshold:
-            cut_frag_list = structure.cut_molecule(size_threshold=size_threshold)
-        else:
-            cut_frag_list = structure.cut_molecule()
+        cut_frag_list = structure.cut_molecule(size_threshold=size_threshold)
         logging.info('The original molecule {0} is divided into several fragments:'.format(label))
         for initial_frag in cut_frag_list:
             frag_label = initial_frag.to_smiles()
@@ -283,13 +280,9 @@ def simple_reactor(temperature,
             # calculate total as denominator
             total = float(0)
             for initial_mol, value in initialMoleFractions.items():
-                try:
-                    total += value * sum(mol_to_frag[initial_mol].values())
-                except KeyError:
-                    # there might be other species which set cut to be False but in initialMoleFractions
-                    mol_to_frag[initial_mol] = {}
-                    mol_to_frag[initial_mol][initial_mol] = 1
-                    total += value * sum(mol_to_frag[initial_mol].values())
+                if initial_mol not in mol_to_frag: # there might be other species which set cut to be False but in initialMoleFractions
+                    mol_to_frag[initial_mol] = {initial_mol: 1}
+                total += value * sum(mol_to_frag[initial_mol].values())
             for key, frag_dict in mol_to_frag.items():
                 # if not perform cutting, no need to modify initialMoleFractions
                 # only 1 species in system and it does not get cut, then no need to modify initialMoleFractions
