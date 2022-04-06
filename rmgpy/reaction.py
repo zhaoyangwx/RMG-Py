@@ -1175,7 +1175,7 @@ class Reaction:
                 for atom in spc.molecule[0].atoms:
                     if isinstance(atom, Atom) and atom.element.number in numbers:
                         ele_count[atom.element.number] += 1
-                return tuple(ele_count.values())
+                return tuple(ele_count[n] for n in numbers)
             # Sort the reactants and products by element counts
             reactants.sort(key=get_sorting_key)
             products.sort(key=get_sorting_key)
