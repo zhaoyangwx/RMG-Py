@@ -1,6 +1,7 @@
 import os
 from urllib.parse import quote
 import itertools
+import logging
 
 import rmgpy.molecule.group as gr
 import rmgpy.molecule.element as elements
@@ -49,7 +50,7 @@ class CuttingLabel(Vertex):
     def is_specific_case_of(self, other):
         """
         Return ``True`` if `self` is a specific case of `other`, or ``False``
-        otherwise. At this moment, this is the same as the :meth:`equivalent()`.
+        otherwise. At this moment, this is the same as the :math:`equivalent()`.
         """
         return self.equivalent(other)
 
@@ -204,6 +205,16 @@ class Fragment(Graph):
         """
         g = Graph.copy(self, deep)
         other = Fragment(vertices=g.vertices)
+        # Copy connectivity values and sorting labels
+        for i in range(len(self.vertices)):
+            v1 = self.vertices[i]
+            v2 = other.vertices[i]
+            v2.connectivity1 = v1.connectivity1
+            v2.connectivity2 = v1.connectivity2
+            v2.connectivity3 = v1.connectivity3
+            v2.sorting_label = v1.sorting_label
+        other.multiplicity = self.multiplicity
+        other.reactive = self.reactive
         return other
 
     def clear_labeled_atoms(self):
@@ -415,6 +426,7 @@ class Fragment(Graph):
         """
         Convert an InChI string `inchistr` to a molecular structure.
         """
+        import rmgpy.molecule.translator as translator
         translator.from_inchi(self, inchistr, backend)
         return self
 
