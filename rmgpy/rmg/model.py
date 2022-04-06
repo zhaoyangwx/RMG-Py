@@ -469,7 +469,7 @@ class CoreEdgeReactionModel:
                 # check if the product is too large so that we can cut
                 # maybe species do not contain element C
                 try:
-                    if forward.family in ['R_Recombination', 'R_Addition_MultipleBond'] and pass_cutting_threshold(forward.products[0]):
+                    if len(forward.reactants) > len(forward.products) and pass_cutting_threshold(forward.products[0]):
                         # need to cut
                         check_cut=True
                     else:
