@@ -36,6 +36,7 @@ import rmgpy.constants as constants
 from rmgpy.data.rmg import get_db
 from rmgpy.statmech import Conformer
 from rmgpy.thermo import Wilhoit, NASA, ThermoData
+from rmgpy.molecule import Molecule
 
 
 def process_thermo_data(spc, thermo0, thermo_class=NASA, solvent_name=''):
@@ -155,8 +156,6 @@ def evaluator(spc, solvent_name=''):
 
     """
     logging.debug("Evaluating spc %s ", spc)
-
-    from rmgpy.molecule import Molecule
 
     if isinstance(spc.molecule[0], Molecule):
         spc.generate_resonance_structures()
