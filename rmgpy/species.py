@@ -331,11 +331,7 @@ class Species(object):
 
         If ``strict=False``, performs the check ignoring electrons and resonance structures.
         """
-        if isinstance(other, Molecule):
-            for molecule in self.molecule:
-                if molecule.is_identical(other, strict=strict):
-                    return True
-        elif isinstance(other, Fragment):
+        if isinstance(other, Molecule) or isinstance(other, Fragment):
             for molecule in self.molecule:
                 if molecule.is_identical(other, strict=strict):
                     return True
