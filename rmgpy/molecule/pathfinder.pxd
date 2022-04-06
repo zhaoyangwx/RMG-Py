@@ -25,7 +25,7 @@
 #                                                                             #
 ###############################################################################
 
-from .graph cimport Vertex, Graph
+from .graph cimport Vertex, Edge, Graph
 
 cpdef list find_butadiene(Vertex start, Vertex end)
 
