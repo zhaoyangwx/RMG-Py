@@ -58,7 +58,7 @@ def to_rdkit_mol(mol, remove_h=True, return_mapping=False, sanitize=True):
     If return_mapping==True then it also returns a dictionary mapping the
     atoms to RDKit's atom indices.
     """
-    from rmgpy.molecule.fragment import CuttingLabel
+    from rmgpy.molecule.fragment import Fragment
     # Sort the atoms before converting to ensure output is consistent
     # between different runs
     mol.sort_atoms()
@@ -84,7 +84,9 @@ def to_rdkit_mol(mol, remove_h=True, return_mapping=False, sanitize=True):
             rd_atom_indices[atom] = index
 
         # Check if a cutting label is present. If preserve this so that it is added to the SMILES string
-        if isinstance(atom, CuttingLabel):
+        # Fragment's representative species is Molecule (with CuttingLabel replaced by Si but label as CuttingLabel)
+        # so we use detect_cutting_label to check atom.label
+        if Fragment().detect_cutting_label(atom.label):
             saved_index = index
             label = atom.label
             if label in label_dict:
