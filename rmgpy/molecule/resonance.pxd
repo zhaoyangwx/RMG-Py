@@ -25,7 +25,8 @@
 #                                                                             #
 ###############################################################################
 
-from rmgpy.molecule.graph cimport Graph
+from rmgpy.molecule.graph cimport Vertex, Edge, Graph
+from rmgpy.molecule.molecule cimport Atom, Bond, Molecule
 
 cpdef list populate_resonance_algorithms(dict features=?)
 
