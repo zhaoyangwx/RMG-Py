@@ -1664,21 +1664,11 @@ class Fragment(Graph):
             else:
                 frag_smiles_list = self.sliceitup_aliph(mol.to_smiles(), size_threshold=size_threshold)
 
-        frag_list_new = []
-        for frag_smiles in frag_smiles_list:
-            n_frag_smiles = frag_smiles.replace('F', 'R')
-            nn_frag_smiles = n_frag_smiles.replace('Cl', 'L')
-            # cutting position near aromatic
-            nnn_frag_smiles = nn_frag_smiles.replace('Br', 'R')
-            new_frag_smiles = nnn_frag_smiles.replace('I', 'L')
-
-            frag_list_new.append(new_frag_smiles)
-
         if output_smiles == True:
-            return frag_list_new
+            return frag_smiles_list
         else:
             frag_list = []
-            for frag in frag_list_new:
+            for frag in frag_smiles_list:
                 frag = Fragment().from_smiles_like_string(frag)
                 res_frag = frag.generate_resonance_structures()[0]
                 frag_list.append(res_frag)
@@ -1692,7 +1682,7 @@ class Fragment(Graph):
         if size_threshold != None:
             size_threshold = size_threshold
         else:
-            size_threshold = 4
+            size_threshold = 5
         # if input is smiles string, output smiles
         if isinstance(molecule, str):
             molecule_smiles = molecule
@@ -1714,7 +1704,7 @@ class Fragment(Graph):
                 if atom.symbol == 'R':
                     cuttinglabel_atom.SetAtomicNum(11) #[Na], will replace back to CuttingLabel later
                 else:
-                    cuttinglabel_atom.SetAtomicNum(12) #[Mg]
+                    cuttinglabel_atom.SetAtomicNum(19) #[K]
 
         # substructure matching
         pattern_list = ['pattern_1','pattern_2','pattern_3','pattern_4']
@@ -1778,7 +1768,7 @@ class Fragment(Graph):
                 # replace metal atom back to Cuttinglabel
                 for metal_frag in frag_list:
                     n_frag_smiles = metal_frag.replace('[Na]', 'R')
-                    nn_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                    nn_frag_smiles = n_frag_smiles.replace('[K]', 'L')
                     frag_list_replaced.append(nn_frag_smiles)
                 frag_list = frag_list_replaced
 
@@ -1786,14 +1776,14 @@ class Fragment(Graph):
             frag_list_new = []
             for frag in frag_list:
                 n_frag_smiles = frag.replace('[Na]', 'R')
-                new_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                new_frag_smiles = n_frag_smiles.replace('[K]', 'L')
                 frag_list_new.append(new_frag_smiles)
             return frag_list_new
         elif isinstance(molecule, Fragment):
             frag_list_new = []
             for frag in frag_list:
                 n_frag_smiles = frag.replace('[Na]', 'R')
-                new_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                new_frag_smiles = n_frag_smiles.replace('[K]', 'L')
 
                 frag = Fragment().from_smiles_like_string(new_frag_smiles)
                 res_frag = frag.generate_resonance_structures()[0]
@@ -1808,7 +1798,7 @@ class Fragment(Graph):
         if size_threshold != None:
             size_threshold = size_threshold
         else:
-            size_threshold = 4
+            size_threshold = 5
         # if input is smiles string, output smiles
         if isinstance(molecule, str):
             molecule_smiles = molecule
@@ -1830,7 +1820,7 @@ class Fragment(Graph):
                 if atom.symbol == 'R':
                     cuttinglabel_atom.SetAtomicNum(11) #[Na], will replace back to CuttingLabel later
                 else:
-                    cuttinglabel_atom.SetAtomicNum(12) #[Mg]
+                    cuttinglabel_atom.SetAtomicNum(19) #[K]
 
         # substructure matching
         pattern_list = ['pattern_1','pattern_2','pattern_3']
@@ -1897,7 +1887,7 @@ class Fragment(Graph):
                 # replace metal atom back to Cuttinglabel
                 for metal_frag in frag_list:
                     n_frag_smiles = metal_frag.replace('[Na]', 'R')
-                    nn_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                    nn_frag_smiles = n_frag_smiles.replace('[K]', 'L')
                     frag_list_replaced.append(nn_frag_smiles)
                 frag_list = frag_list_replaced
 
@@ -1905,14 +1895,14 @@ class Fragment(Graph):
             frag_list_new = []
             for frag in frag_list:
                 n_frag_smiles = frag.replace('[Na]', 'R')
-                new_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                new_frag_smiles = n_frag_smiles.replace('[K]', 'L')
                 frag_list_new.append(new_frag_smiles)
             return frag_list_new
         elif isinstance(molecule, Fragment):
             frag_list_new = []
             for frag in frag_list:
                 n_frag_smiles = frag.replace('[Na]', 'R')
-                new_frag_smiles = n_frag_smiles.replace('[Mg]', 'L')
+                new_frag_smiles = n_frag_smiles.replace('[K]', 'L')
 
                 frag = Fragment().from_smiles_like_string(new_frag_smiles)
                 res_frag = frag.generate_resonance_structures()[0]
@@ -1996,17 +1986,8 @@ class Fragment(Graph):
 
             if pattern == 'pattern_3':
                 mol = Chem.MolFromSmiles('CCCCCC')
-                mol = Chem.AddHs(mol,onlyOnAtoms=[1,2,3,4])
+                mol = Chem.AddHs(mol,onlyOnAtoms=[2,3])
                 emol = Chem.RWMol(mol)
-                # add some H at aliphatic C
-                emol.AddAtom(Chem.rdchem.Atom('H'))
-                emol.AddBond(0,14,Chem.rdchem.BondType.SINGLE)
-                emol.AddAtom(Chem.rdchem.Atom('H'))
-                emol.AddBond(0,15,Chem.rdchem.BondType.SINGLE)
-                emol.AddAtom(Chem.rdchem.Atom('H'))
-                emol.AddBond(5,16,Chem.rdchem.BondType.SINGLE)
-                emol.AddAtom(Chem.rdchem.Atom('H'))
-                emol.AddBond(5,17,Chem.rdchem.BondType.SINGLE)
                 atom_map_index = [2]
         else:
             raise NameError("Currently only Arom or Aliph type patterns are included")
